@@ -3,8 +3,10 @@ Schedule Models
 ===============
 """
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import User
 import datetime
+import calendar
 
 
 class Position(models.Model):
@@ -47,6 +49,15 @@ class Employee(models.Model):
         null=True,
         blank=True,
         related_name='employees'
+    )
+    status_options = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+    ]
+    status = models.CharField(
+        max_length='20',
+        choices=status_options,
+        default='active'
     )
 
     def __str__(self):
@@ -332,204 +343,152 @@ class Employee(models.Model):
         week.save()
         return week
 
+    @staticmethod
+    def employee_list():
+        employees = list()
+        sm = Position.store_manager()
+        qs = Employee.objects.filter(status='active')
+        for emp in qs:
+            if emp.position != sm:
+                employees.append(emp)
+        return employees
+
+    @staticmethod
+    def reps():
+        employees = list()
+        rep = Position.sales_rep()
+        return Employee.objects.filter(status='active', position=rep)
+
 
 class Shift(models.Model):
     name = models.CharField(max_length=30, blank=True)
+    date = models.DateField()
     start = models.TimeField()
     end = models.TimeField()
+    employee = models.ForeignKey(
+        Employee,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='shifts'
+    )
 
     def __str__(self):
-        return self.name
+        ret = 'close ' + str(self.date)
+        if self.employee:
+            ret = ret + " - " + self.employee.user.username
+        return ret
+
+    def is_open(self):
+        return self.name == 'open'
+
+    def is_mid(self):
+        return self.name == 'mid'
+
+    def is_close(self):
+        return self.name == 'close'
 
     @staticmethod
-    def open():
-        s, created = Shift.objects.get_or_create(
+    def on_day(day):
+        ret = dict()
+        ret['open'] = False
+        ret['mid'] = False
+        ret['close'] = False
+        shifts = Shift.objects.filter(date=day)
+        if shifts.exists():
+            for shift in shifts:
+                if shift.is_open():
+                    ret['open'] = True
+                elif shift.is_close():
+                    ret['close'] = True
+                elif shift.is_mid():
+                    ret['mid'] = True
+        return ret
+
+    @staticmethod
+    def open(date, employee):
+        return Shift.objects.create(
             name='open',
-            defaults={'start':datetime.time(9, 0, 0),
-                      'end':datetime.time(17, 30, 0)}
+            date=date,
+            start=datetime.time(9, 0, 0),
+            end=datetime.time(17, 30, 0),
+            employee=employee
         )
-        return s
 
     @staticmethod
-    def mid():
-        s, created = Shift.objects.get_or_create(
+    def mid(date, employee):
+        return Shift.objects.create(
             name='mid',
-            defaults={'start': datetime.time(11, 0, 0),
-                      'end': datetime.time(19, 0, 0)}
+            date=date,
+            start=datetime.time(11, 0, 0),
+            end=datetime.time(19, 0, 0),
+            employee=employee
         )
-        return s
 
     @staticmethod
-    def early_mid():
-        s, created = Shift.objects.get_or_create(
-            name='late_mid',
-            defaults={'start': datetime.time(10, 0, 0),
-                      'end': datetime.time(18, 0, 0)}
+    def early_mid(date, employee):
+        return Shift.objects.create(
+            name='mid',
+            date=date,
+            start=datetime.time(10, 0, 0),
+            end=datetime.time(18, 0, 0),
+            employee=employee
         )
-        return s
 
     @staticmethod
-    def close():
-        s, created = Shift.objects.get_or_create(
+    def close(date, employee):
+        return Shift.objects.create(
             name='close',
-            defaults={'start': datetime.time(12, 0, 0),
-                      'end': datetime.time(20, 0, 0)}
+            date=date,
+            start=datetime.time(12, 0, 0),
+            end=datetime.time(20, 0, 0),
+            employee=employee
         )
-        return s
 
     @staticmethod
-    def sunday():
-        s, created = Shift.objects.get_or_create(
-            name='sunday',
-            defaults={'start': datetime.time(10, 0, 0),
-                      'end': datetime.time(17, 0, 0)}
+    def sunday(date, employee):
+        return Shift.objects.create(
+            name='close',
+            date=date,
+            start=datetime.time(10, 0, 0),
+            end=datetime.time(17, 0, 0),
+            employee=employee
         )
-        return s
 
 
-class Day(models.Model):
-    date = models.DateField()
-    week_day = models.CharField(max_length=20, blank=True)
-    open = models.ManyToManyField(Employee, related_name='opens')
-    mid = models.ManyToManyField(Employee, related_name='mids')
-    early_mid = models.ManyToManyField(Employee, related_name='early_mids')
-    close = models.ManyToManyField(Employee, related_name='closes')
-    sunday_shift = models.ManyToManyField(Employee, related_name='sunday_shifts')
-    off = models.ManyToManyField(Employee, related_name='offs')
-
-    def __str__(self):
-        return self.week_day + str(self.date)
-
-    @staticmethod
-    def sunday(date):
-        return Day.objects.create(week_day="Sunday", date=date)
-
-    @staticmethod
-    def monday(date):
-        return Day.objects.create(week_day="Monday", date=date)
-
-    @staticmethod
-    def tuesday(date):
-        return Day.objects.create(week_day="Tuesday", date=date)
-
-    @staticmethod
-    def wednesday(date):
-        return Day.objects.create(week_day="Wednesday", date=date)
-
-    @staticmethod
-    def thursday(date):
-        return Day.objects.create(week_day="Thursday", date=date)
-
-    @staticmethod
-    def friday(date):
-        return Day.objects.create(week_day="Friday", date=date)
-
-    @staticmethod
-    def saturday(date):
-        return Day.objects.create(week_day="Saturday", date=date)
-
-
-class Week(models.Model):
-    sunday = models.ForeignKey(
-        Day,
-        related_name='sundays',
-        on_delete=models.CASCADE
+class Leave(models.Model):
+    employee = models.ForeignKey(
+        Employee,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='leaves'
     )
-    monday = models.ForeignKey(
-        Day,
-        related_name='mondays',
-        on_delete=models.CASCADE
-    )
-    tuesday = models.ForeignKey(
-        Day,
-        related_name='tuesdays',
-        on_delete=models.CASCADE
-    )
-    wednesday = models.ForeignKey(
-        Day,
-        related_name='wednesdays',
-        on_delete=models.CASCADE
-    )
-    thursday = models.ForeignKey(
-        Day,
-        related_name='thursdays',
-        on_delete=models.CASCADE
-    )
-    friday = models.ForeignKey(
-        Day,
-        related_name='fridays',
-        on_delete=models.CASCADE
-    )
-    saturday = models.ForeignKey(
-        Day,
-        related_name='saturdays',
-        on_delete=models.CASCADE
-    )
+    start = models.DateField()
+    end = models.DateField()
 
-    def __str__(self):
-        return str(self.sunday.date) + " - " + str(self.saturday.date)
 
-    def schedule_sunday(self):
-        employee = Employee.objects.all().order_by('sunday_shifts__date')[:1].get()
-        self.sunday.sunday_shift.add(employee)
+class SSW(models.Model):
+    start = models.DateField()
+    end = models.DateField()
 
     @staticmethod
-    def previous_week(week):
-        prev_sun_date = week.sunday.date - datetime.timedelta(days=7)
-        try:
-            prev_week = Week.objects.get(sunday__date=prev_sun_date)
-        except Week.DoesNotExist:
-            prev_week = Week.create(prev_sun_date)
-            sm = Employee.store_manager()
-            asm = Employee.store_manager()
-            prev_week.sunday.off.add(sm)
-            prev_week.sunday.off.add(asm)
-            prev_week.monday.off.add(sm)
-            prev_week.monday.off.add(asm)
-            prev_week.tuesday.off.add(sm)
-            prev_week.tuesday.off.add(asm)
-            prev_week.wednesday.off.add(sm)
-            prev_week.wednesday.off.add(asm)
-            prev_week.thursday.off.add(sm)
-            prev_week.thursday.off.add(asm)
-            prev_week.friday.off.add(sm)
-            prev_week.friday.off.add(asm)
-            prev_week.saturday.off.add(sm)
-            prev_week.saturday.off.add(asm)
-            prev_week.save()
-        return prev_week
-
-    @staticmethod
-    def schedule_shifts(week, prev_week):
-        sm = Employee.store_manager()
-        week = sm.schedule_manager_week(week, prev_week)
-        asm = Employee.asm()
-        week = asm.schedule_asm_week(week, prev_week)
-        reps = Employee.objects.filter(
-            position=Position.sales_rep()).order_by('sundays__date')
-        for rep in reps:
-            week = rep.schedule_rep_week(week)
-        return week
-
-    @staticmethod
-    def create(start):
-        week = Week.objects.create(
-            sunday=Day.sunday(start),
-            monday=Day.monday(start+datetime.timedelta(days=1)),
-            tuesday=Day.tuesday(start+datetime.timedelta(days=2)),
-            wednesday=Day.wednesday(start+datetime.timedelta(days=3)),
-            thursday=Day.thursday(start+datetime.timedelta(days=4)),
-            friday=Day.friday(start+datetime.timedelta(days=5)),
-            saturday=Day.saturday(start+datetime.timedelta(days=6))
+    def create(start, end):
+        return SSW.objects.create(
+            start=start,
+            end=end
         )
-        return week
 
     @staticmethod
-    def create_schedule(start):
-        week = Week.create(start)
-        prev_week = Week.previous_week(week)
-        print(prev_week)
-        week = week.schedule_shifts(week, prev_week)
-        week.save()
-        return week
+    def get_for(date):
+        return SSW.objects.get(
+            Q(start__lte=date),
+            Q(end__qte=date)
+        )
 
+    def falls_within(self, date):
+        if date < self.start:
+            return False
+        if date > self.end:
+            return False
+        return True
