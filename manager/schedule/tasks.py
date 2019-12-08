@@ -9,18 +9,18 @@ from random import randint
 def sunday_list(sunday):
     order = list()
     employee_list = models.Employee.employee_list()
-    employee_count = employee_list.count()
+    employee_count = len(employee_list)
     delta = timedelta(days=7)
     day = sunday - delta
-    while order.count() < employee_count:
-        qs = models.Shift.filter(date=day)
+    while len(order) < employee_count:
+        qs = models.Shift.objects.filter(date=day)
         if qs.count() == 0:
             break
         for s in qs:
             order.append(s.employee)
         day = day - delta
-    if order.count() < employee_count:
-        if order.count() == 0:
+    if len(order) < employee_count:
+        if len(order) == 0:
             order = employee_list
         else:
             for emp in employee_list:
@@ -30,8 +30,8 @@ def sunday_list(sunday):
 
 
 def schedule_sunday(sunday):
-    employee_order = sunday_list()
-    sunday_count = models.Shift.filter(day=sunday).count()
+    employee_order = sunday_list(sunday)
+    sunday_count = models.Shift.objects.filter(date=sunday).count()
     index = 0
     while sunday_count < 2:
         models.Shift.sunday(sunday, employee_order[index])
@@ -43,7 +43,7 @@ def schedule_sm_week(sunday, ssw=None):
     seed(datetime.now().microsecond)
     sm = models.Employee.store_manager()
     year, week, weekday = sunday.isocalendar()
-    delta_day = timedelta(day=1)
+    delta_day = timedelta(days=1)
     monday = sunday + delta_day
     tuesday = monday + delta_day
     wednesday = tuesday + delta_day
@@ -63,7 +63,7 @@ def schedule_sm_week(sunday, ssw=None):
     fri_shift = models.Shift.open(friday, sm)
     if ssw:
         if ssw.falls_within(friday):
-            if randint() % 2 == 0:
+            if randint(0, 100) % 2 == 0:
                 tues_shift.delete()
             else:
                 wed_shift.delete()
@@ -81,7 +81,7 @@ def schedule_sm_week(sunday, ssw=None):
                     fri_shift.delete()
                     sat_shift = models.Shift.open(saturday, sm)
         if ssw.falls_within(sunday):
-            if randint() % 2 == 0:
+            if randint(0, 100) % 2 == 0:
                 tues_shift.delete()
             else:
                 wed_shift.delete()
@@ -91,7 +91,7 @@ def schedule_sm_week(sunday, ssw=None):
 def schedule_asm_week(sunday, ssw=None):
     asm = models.Employee.asm()
     year, week, weekday = sunday.isocalendar()
-    delta_day = timedelta(day=1)
+    delta_day = timedelta(days=1)
     monday = sunday + delta_day
     tuesday = monday + delta_day
     wednesday = tuesday + delta_day
@@ -136,7 +136,7 @@ def schedule_asm_week(sunday, ssw=None):
     else:
         sat_count = models.Shift.objects.filter(date=saturday).count()
         if sat_count == 0:
-            if randint() % 2 == 0:
+            if randint(0, 100) % 2 == 0:
                 tues_shift.delete()
                 tues_shift = None
             else:
@@ -176,7 +176,7 @@ def add_shift(rep, day, opens, closes, mids, force=False):
 
 def schedule_rep_week(rep, sunday, ssw=None):
     year, week, weekday = sunday.isocalendar()
-    delta_day = timedelta(day=1)
+    delta_day = timedelta(days=1)
     monday = sunday + delta_day
     tuesday = monday + delta_day
     wednesday = tuesday + delta_day
@@ -223,10 +223,8 @@ def schedule_rep_week(rep, sunday, ssw=None):
 
 def schedule_week(sunday):
     ssw = models.SSW.get_for(sunday + timedelta(days=5))
-    if not ssw.exists():
+    if not ssw:
         ssw = models.SSW.get_for(sunday)
-    if not ssw.exists():
-        ssw = None
     schedule_sm_week(sunday)
     schedule_sunday(sunday)
     schedule_asm_week(sunday, ssw)
