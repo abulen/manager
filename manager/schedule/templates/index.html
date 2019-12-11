@@ -1,0 +1,14 @@
+{% extends "lev8/base.html" %}
+
+{% block content %}
+<table class="table table-striped">
+    <tbody>
+    <tr class="clickable" onclick="window.location='{% url 'project:project-index' %}'">
+        <td align="center">Projects</td>
+    </tr>
+    <tr class="clickable" onclick="window.location='{% url 'product:product-index' %}'">
+        <td align="center">Products</td>
+    </tr>
+    </tbody>
+</table>
+{% endblock %}

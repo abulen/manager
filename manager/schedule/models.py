@@ -4,87 +4,11 @@ Schedule Models
 """
 from django.db import models
 from django.db.models import Q
+from employee.models import Employee
+from django.urls import reverse
 from django.contrib.auth.models import User
 import datetime
 import calendar
-
-
-class Position(models.Model):
-    name = models.CharField(max_length=50, blank=True)
-    manager = models.BooleanField(default=False, blank=True)
-
-    def __str__(self):
-        return self.name
-
-    @staticmethod
-    def store_manager():
-        obj, created = Position.objects.get_or_create(
-            name='Store Manager',
-            defaults={'manager': True}
-        )
-        return obj
-
-    @staticmethod
-    def assistant_store_manager():
-        obj, created = Position.objects.get_or_create(
-            name='Assistant Store Manager',
-            defaults={'manager': True}
-        )
-        return obj
-
-    @staticmethod
-    def sales_rep():
-        obj, created = Position.objects.get_or_create(
-            name='Sales Representative',
-            defaults={'manager': False}
-        )
-        return obj
-
-
-class Employee(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    position = models.ForeignKey(
-        Position,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='employees'
-    )
-    status_options = [
-        ('active', 'Active'),
-        ('inactive', 'Inactive'),
-    ]
-    status = models.CharField(
-        max_length=20,
-        choices=status_options,
-        default='active'
-    )
-
-    def __str__(self):
-        return self.user.username
-
-    @staticmethod
-    def store_manager():
-        return Employee.objects.get(position=Position.store_manager())
-
-    @staticmethod
-    def asm():
-        return Employee.objects.get(position=Position.assistant_store_manager())
-
-    @staticmethod
-    def employee_list():
-        employees = list()
-        sm = Position.store_manager()
-        qs = Employee.objects.filter(status='active')
-        for emp in qs:
-            if emp.position != sm:
-                employees.append(emp)
-        return employees
-
-    @staticmethod
-    def reps():
-        rep = Position.sales_rep()
-        return Employee.objects.filter(status='active', position=rep)
 
 
 class Shift(models.Model):
@@ -99,6 +23,15 @@ class Shift(models.Model):
         blank=True,
         related_name='shifts'
     )
+
+    def get_absolute_url(self):
+        url = reverse('admin:%s_%s_change' % (
+        self._meta.app_label, self._meta.model_name), args=[self.id])
+        return u'<a href="%s">%s %s - %s</a>' % (url,
+                                                 self.employee.user.username,
+                                                 self.start.strftime("%I:%M"),
+                                                 self.end.strftime("%I:%M")
+                                                 )
 
     def __str__(self):
         ret = self.name + ' ' + str(self.date)
@@ -118,19 +51,39 @@ class Shift(models.Model):
     @staticmethod
     def on_day(day):
         ret = dict()
-        ret['open'] = False
-        ret['mid'] = False
-        ret['close'] = False
+        ret['open'] = 0
+        ret['mid'] = 0
+        ret['close'] = 0
+        ret['total'] = 0
         shifts = Shift.objects.filter(date=day)
         if shifts.exists():
             for shift in shifts:
                 if shift.is_open():
-                    ret['open'] = True
+                    ret['open'] += 1
                 elif shift.is_close():
-                    ret['close'] = True
+                    ret['close'] += 1
                 elif shift.is_mid():
-                    ret['mid'] = True
+                    ret['mid'] += 1
+                ret['total'] += 1
         return ret
+
+    @staticmethod
+    def week_shift_distribution(sunday, saturday):
+        day_delta = datetime.timedelta(days=1)
+        monday = sunday + day_delta
+        tuesday = monday + day_delta
+        wednesday = tuesday + day_delta
+        thursday = wednesday + day_delta
+        friday = thursday + day_delta
+        shifts = dict()
+        shifts["sunday"] = Shift.on_day(sunday)
+        shifts["monday"] = Shift.on_day(monday)
+        shifts["tuesday"] = Shift.on_day(tuesday)
+        shifts["wednesday"] = Shift.on_day(wednesday)
+        shifts["thursday"] = Shift.on_day(thursday)
+        shifts["friday"] = Shift.on_day(friday)
+        shifts["saturday"] = Shift.on_day(saturday)
+        return shifts
 
     @staticmethod
     def open(date, employee):
@@ -191,35 +144,35 @@ class Leave(models.Model):
         blank=True,
         related_name='leaves'
     )
-    start = models.DateField()
-    end = models.DateField()
+    date = models.DateField()
+
+    def get_absolute_url(self):
+        url = reverse('admin:%s_%s_change' % (
+        self._meta.app_label, self._meta.model_name), args=[self.id])
+        return u'<a href="%s">leave - %s</a>' % (url,
+                                                 self.employee.user.username)
 
 
 class SSW(models.Model):
-    start = models.DateField()
-    end = models.DateField()
+    date = models.DateField()
 
     @staticmethod
-    def create(start, end):
+    def create(day):
         return SSW.objects.create(
-            start=start,
-            end=end
+            date=day
         )
 
     @staticmethod
     def get_for(date):
         try:
             qs = SSW.objects.get(
-                Q(start__lte=date),
-                Q(end__gte=date)
+                Q(date=date)
             )
             return qs
         except SSW.DoesNotExist:
             return None
 
-    def falls_within(self, date):
-        if date < self.start:
-            return False
-        if date > self.end:
-            return False
-        return True
+    def get_absolute_url(self):
+        url = reverse('admin:%s_%s_change' % (
+        self._meta.app_label, self._meta.model_name), args=[self.id])
+        return u'<a href="%s">SSW</a>' % (url, )
