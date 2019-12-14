@@ -259,23 +259,45 @@ def add_shift(rep, day, opens, closes, mids, force=False):
     return opens, closes, mids
 
 
-def get_lightest_day(week_dist, sunday, shift='total'):
+def get_lightest_day(week_dist, sunday, leaves, shift='total'):
     # Priority - Friday, Monday, Saturday, Thursday, Wednesday, Tuesday
-    day = 'friday'
-    d_days = 5
-    if week_dist['monday'][shift] < week_dist[day][shift]:
+    # Initialize
+    if not leaves["friday"]:
+        day = 'friday'
+        d_days = 5
+    elif not leaves["monday"]:
         day = 'monday'
         d_days = 1
-    if week_dist['saturday'][shift] < week_dist[day][shift]:
+    elif not leaves["saturday"]:
         day = 'saturday'
         d_days = 6
-    if week_dist['thursday'][shift] < week_dist[day][shift]:
+    elif not leaves["thursday"]:
         day = 'thursday'
         d_days = 4
-    if week_dist['wednesday'][shift] < week_dist[day][shift]:
+    elif not leaves["wednesday"]:
         day = 'wednesday'
         d_days = 3
-    if week_dist['tuesday'][shift] < week_dist[day][shift]:
+    elif not leaves["tuesday"]:
+        day = 'tuesday'
+        d_days = 2
+    if not leaves["monday"] and \
+            week_dist['monday'][shift] < week_dist[day][shift]:
+        day = 'monday'
+        d_days = 1
+    if not leaves["saturday"] and \
+            week_dist['saturday'][shift] < week_dist[day][shift]:
+        day = 'saturday'
+        d_days = 6
+    if not leaves["thursday"] and \
+            week_dist['thursday'][shift] < week_dist[day][shift]:
+        day = 'thursday'
+        d_days = 4
+    if not leaves["wednesday"] and \
+            week_dist['wednesday'][shift] < week_dist[day][shift]:
+        day = 'wednesday'
+        d_days = 3
+    if not leaves["tuesday"] and \
+            week_dist['tuesday'][shift] < week_dist[day][shift]:
         day = 'tuesday'
         d_days = 2
     return sunday + timedelta(days=d_days)
@@ -304,6 +326,13 @@ def schedule_rep_week(rep, sunday, ssws):
     l_thur = leaves.filter(date=thursday).exists()
     l_fri = leaves.filter(date=friday).exists()
     l_sat = leaves.filter(date=saturday).exists()
+    l_week = dict()
+    l_week["monday"] = l_mon
+    l_week["tuesday"] = l_tues
+    l_week["wednesday"] = l_wed
+    l_week["thursday"] = l_thur
+    l_week["friday"] = l_fri
+    l_week["saturday"] = l_sat
     l_count = 0
     if l_sun:
         l_count += 1
@@ -389,15 +418,15 @@ def schedule_rep_week(rep, sunday, ssws):
     while opens < target_opens or mids < target_mids or closes < target_closes:
         schedule_dist = models.Shift.week_shift_distribution(sunday, saturday)
         if opens < target_opens:
-            day = get_lightest_day(schedule_dist, sunday, 'total')
+            day = get_lightest_day(schedule_dist, sunday, l_week, 'total')
             models.Shift.open(day, rep)
             opens += 1
         if mids < target_mids:
-            day = get_lightest_day(schedule_dist, sunday, 'total')
+            day = get_lightest_day(schedule_dist, sunday, l_week, 'total')
             models.Shift.early_mid(day, rep)
             mids += 1
         if closes < target_closes:
-            day = get_lightest_day(schedule_dist, sunday, 'total')
+            day = get_lightest_day(schedule_dist, sunday, l_week, 'total')
             models.Shift.close(day, rep)
             closes += 1
 
