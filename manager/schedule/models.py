@@ -27,7 +27,7 @@ class Shift(models.Model):
     def get_absolute_url(self):
         url = reverse('admin:%s_%s_change' % (
         self._meta.app_label, self._meta.model_name), args=[self.id])
-        return u'<a href="%s">%s %s - %s</a>' % (url,
+        return u'<a class="shift" href="%s">%s <br> %s - %s</a>' % (url,
                                                  self.employee.user.username,
                                                  self.start.strftime("%I:%M"),
                                                  self.end.strftime("%I:%M")
@@ -130,10 +130,19 @@ class Shift(models.Model):
         return Shift.objects.create(
             name='close',
             date=date,
-            start=datetime.time(10, 0, 0),
+            start=datetime.time(11, 0, 0),
             end=datetime.time(17, 0, 0),
             employee=employee
         )
+
+    @staticmethod
+    def last():
+        qs = Shift.objects.all().order_by('-date')
+        if qs.exists():
+            day = qs[0].date
+        else:
+            day = datetime.date.today() - datetime.timedelta(days=1)
+        return day
 
 
 class Leave(models.Model):
@@ -149,8 +158,15 @@ class Leave(models.Model):
     def get_absolute_url(self):
         url = reverse('admin:%s_%s_change' % (
         self._meta.app_label, self._meta.model_name), args=[self.id])
-        return u'<a href="%s">leave - %s</a>' % (url,
+        return u'<a class="leave" href="%s">leave - %s</a>' % (url,
                                                  self.employee.user.username)
+
+    @staticmethod
+    def create(emp, day):
+        return Leave.objects.get_or_create(
+            employee=emp,
+            date=day
+        )
 
 
 class SSW(models.Model):
@@ -158,7 +174,7 @@ class SSW(models.Model):
 
     @staticmethod
     def create(day):
-        return SSW.objects.create(
+        return SSW.objects.get_or_create(
             date=day
         )
 
@@ -175,4 +191,4 @@ class SSW(models.Model):
     def get_absolute_url(self):
         url = reverse('admin:%s_%s_change' % (
         self._meta.app_label, self._meta.model_name), args=[self.id])
-        return u'<a href="%s">SSW</a>' % (url, )
+        return u'<a class="ssw" href="%s">SSW</a>' % (url, )

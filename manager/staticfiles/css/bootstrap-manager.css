@@ -19,7 +19,7 @@ a single block in the template.
 }
 
 .navbar-inverse .brand a {
-  color: #006F41;
+  color: HotPink;
 }
 .navbar-inverse .brand:hover a {
   color: white;
@@ -35,10 +35,10 @@ a single block in the template.
 }
 
 .navbar {
-  background: #2C2C2C;
+  background: DarkSlateGray ;
   color: white;
   border: none;
-  border-top: 5px solid #006F41;
+  border-top: 5px solid HotPink;
   border-radius: 0px;
 }
 
@@ -53,16 +53,16 @@ a single block in the template.
 }
 
 .nav-list > .active > a, .nav-list > .active > a:hover {
-  background: #2C2C2C;
+  background: DarkSlateGray ;
 }
 
 .navbar .dropdown-menu li a, .navbar .dropdown-menu li {
-  color: #006F41;
+  color: HotPink;
 }
 
 .navbar .dropdown-menu li a:hover {
-  background: #EEEEEE;
-  color: #C20000;
+  background: LightGrey;
+  color: Red;
 }
 
 ul.breadcrumb {
@@ -70,7 +70,7 @@ ul.breadcrumb {
 }
 
 .breadcrumb li.active a {
-  color: #777;
+  color: DimGray;
 }
 
 .pagination>.disabled>a,
@@ -162,11 +162,11 @@ body {
 }
 
 .nav-tabs > .active > a {
-  background: #F5F5F5;
+  background: GhostWhite;
 }
 
 .nav-tabs > .active > a:hover {
-  background: #F5F5F5;
+  background: GhostWhite;
 }
 
 .tabbable.first-tab-active .tab-content {
@@ -182,15 +182,15 @@ footer {
   height: 250px;
   width: 100%;
   margin: 0;
-  background-color: #2C2C2C;
-  color: #006F41;
-  border-bottom: 5px solid #006F41;
+  background-color: DarkSlateGray ;
+  color: HotPink;
+  border-bottom: 5px solid HotPink;
 }
 
 footer p {
   text-align: center;
   color: gray;
-  border-top: 1px solid #DDDDDD;
+  border-top: 1px solid DarkGray;
   padding-top: 10px;
 }
 
@@ -209,11 +209,11 @@ footer a:hover {
 }
 
 body a {
-  color: #006F41;
+  color: HotPink;
 }
 
 body a:hover {
-  color: #c20000;
+  color: Red;
 }
 
 .request-info {
@@ -241,50 +241,50 @@ body a:hover {
 
 /*
 .btn-primary {
-    background-color: #006F41
+    background-color: HotPink
 }
 
 .btn-primary:hover {
-    background-color: #1E4D2B
+    background-color: DeepPink
 }
 
 .btn-primary:active {
-    background-color: #00443F
+    background-color: DeepPink
 }
 */
 .btn {
 color:#fff;
-background-color:#006F41;
-border-color:#006F41;
+background-color:HotPink;
+border-color:HotPink;
 margin-left: 2px;
 }
 
 .btn a {
 color: #fff;
-background-color:#006F41;
+background-color:HotPink;
 }
 
 .btn-primary{
 color:#fff;
-background-color:#006F41;border-color:#006F41
+background-color:HotPink;border-color:HotPink
 }
 .btn-primary:hover{
 color:#fff;
-background-color:#1E4D2B;
-border-color:#1E4D2B
+background-color:DeepPink;
+border-color:DeepPink
 }
 .btn-primary.focus,.btn-primary:focus{
 box-shadow:0 0 0 .2rem rgba(0,123,255,.5)
 }
 .btn-primary.disabled,.btn-primary:disabled{
 color:#fff;
-background-color:#007bff;
-border-color:#007bff
+background-color:Blue;
+border-color:Blue
 }
 .btn-primary:not(:disabled):not(.disabled).active,.btn-primary:not(:disabled):not(.disabled):active,.show>.btn-primary.dropdown-toggle{
 color:#fff;
-background-color:#00443F;
-border-color:#00443F
+background-color:DeepPink;
+border-color:DeepPink
 }
 .btn-primary:not(:disabled):not(.disabled).active:focus,.btn-primary:not(:disabled):not(.disabled):active:focus,.show>.btn-primary.dropdown-toggle:focus{
 box-shadow:0 0 0 .2rem rgba(0,123,255,.5)
@@ -295,6 +295,74 @@ box-shadow:0 0 0 .2rem rgba(0,123,255,.5)
 }
 
 .table tr.clickable:hover {
-background:#1E4D2B;
+background:DeepPink;
 color: #fff;
+}
+
+#calendar table {
+border: 1px solid #999;
+border-collapse: collapse;
+font-family: Georgia, Times, serif;
+width: 100%;
+}
+#calendar th {
+text-align: center;
+align: center;
+border: 1px solid #999;
+font-size: 70%;
+text-transform: uppercase;
+}
+#calendar td {
+border: 1px solid #999;
+height: 5em;
+width:5em;
+padding: 5px;
+vertical-align: top;
+}
+#calendar caption {
+font-size: 300%;
+font-style: italic;
+}
+#calendar .day {
+text-align: center;
+}
+#calendar .shift {
+  color: Black;
+  background-color: HotPink;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 80%;
+  width: auto;
+  display: block;
+  text-align: center;
+}
+#calendar .ssw-day
+{
+  color: Black;
+}
+#calendar .ssw {
+  color: Red;
+  background-color: Black;
+  width: auto;
+  display: block;
+  text-align: center;
+}
+#calendar .ssw:hover {
+  color: Yellow;
+}
+#calendar .leave {
+  color: Green;
+  background-color: Black;
+  width: auto;
+  display: block;
+  text-align: center;
+}
+#calendar .leave:hover {
+  color: Yellow;
+}
+#calendar .weekend {
+  background-color: GhostWhite;
+}
+
+#calendar a {
+  width: 100%;
 }

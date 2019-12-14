@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <div id="calendar">
         <ul class="object-tools">
             <li>
                 <a href={{ previous_month }}>
@@ -15,5 +16,5 @@
         </ul>
 
         {{ calendar }}
-
+    </div>
 {% endblock %}

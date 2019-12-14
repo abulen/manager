@@ -74,20 +74,23 @@ class ScheduleCalendar(HTMLCalendar):
         ssws_from_day = ssws.filter(date__day=day)
         leaves_from_day = leaves.filter(date__day=day)
         shifts_from_day = shifts.filter(date__day=day).order_by('start')
-        cal_html = "<ul>"
+        css_classes = self.cssclasses[weekday]
+        #cal_html = "<ul>"
+        cal_html = ""
         for ssw in ssws_from_day:
             cal_html += ssw.get_absolute_url() + "<br>"
+            css_classes += " ssw-day"
         for leave in leaves_from_day:
             cal_html += leave.get_absolute_url() + "<br>"
         for shift in shifts_from_day:
             cal_html += shift.get_absolute_url() + "<br>"
-        cal_html += "</ul>"
+        #cal_html += "</ul>"
 
         if day == 0:
             return '<td class="noday">&nbsp;</td>'  # day outside month
         else:
             return '<td class="%s">%d%s</td>' % (
-            self.cssclasses[weekday], day, cal_html)
+                css_classes, day, cal_html)
 
     def formatweek(self, theweek, shifts, ssws, leaves):
         """

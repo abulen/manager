@@ -154,7 +154,7 @@ class Employee(models.Model):
         sm = Position.store_manager()
         qs = Employee.objects.filter(status='active')
         for emp in qs:
-            if emp != sm:
+            if emp.position != sm:
                 employees.append(emp)
         return employees
 

@@ -20,5 +20,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('auth/api/',
+         include(
+            'rest_framework.urls',
+            namespace='rest_framework')
+         ),
     path('', include('schedule.urls', namespace='schedule')),
+    path('employee/', include('employee.urls', namespace='employee')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

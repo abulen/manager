@@ -1,6 +1,6 @@
 from . import models
 import calendar
-from employee.models import Employee
+from employee.models import Employee, Position
 from schedule.models import Leave, SSW
 from datetime import timedelta
 from datetime import datetime
@@ -15,12 +15,14 @@ def sunday_list(sunday):
     employee_count = len(employee_list)
     delta = timedelta(days=7)
     day = sunday - delta
+    sm = Position.store_manager()
     while len(order) < employee_count:
         qs = models.Shift.objects.filter(date=day)
         if qs.count() == 0:
             break
         for s in qs:
-            order.insert(0, s.employee)
+            if s.employee.position != sm:
+                order.insert(0, s.employee)
         day = day - delta
     if len(order) < employee_count:
         if len(order) == 0:
@@ -87,14 +89,20 @@ def schedule_sm_week(sunday, ssws):
         fri_shift = models.Shift.open(friday, sm)
     if ssws.exists():
         if ssws.filter(date=friday).exists():
-            if randint(0, 100) % 2 == 0:
+            if week % 2 == 0 and not l_tues:
                 if tues_shift:
                     tues_shift.delete()
                     tues_shift = None
+                elif wed_shift:
+                    wed_shift.delete()
+                    wed_shift = None
             else:
                 if wed_shift:
                     wed_shift.delete()
                     wed_shift = None
+                elif tues_shift:
+                    tues_shift.delete()
+                    tues_shift = None
             if thur_shift:
                 thur_shift.delete()
                 thur_shift = None
@@ -122,7 +130,7 @@ def schedule_sm_week(sunday, ssws):
                         sat_shift = models.Shift.open(saturday, sm)
         if ssws.filter(date=sunday).exists():
             if not l_sun:
-                if randint(0, 100) % 2 == 0:
+                if week % 2 == 0:
                     if tues_shift:
                         tues_shift.delete()
                 else:
