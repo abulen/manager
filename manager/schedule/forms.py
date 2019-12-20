@@ -116,3 +116,48 @@ class CreateLeaveForm(forms.Form):
         self.fields['start'].widget.attrs['min'] = date_min
         self.fields['end'].widget.attrs['min'] = date_min
 
+
+class GoogleSyncForm(forms.Form):
+    start = forms.DateField(
+        label="Sync Start",
+        widget=forms.TextInput(
+            attrs={'type': 'date'}
+        )
+    )
+    end = forms.DateField(
+        label="Sync End",
+        widget=forms.TextInput(
+            attrs={'type': 'date'}
+        )
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'google-sync-form'
+        self.helper.form_class = 'blueForms'
+        self.helper.form_method = 'post'
+        self.helper.form_action = 'schedule:google-sync'
+
+        self.helper.add_input(Submit('submit', 'Sync'))
+        date_min = datetime.date.today()
+        day = date_min.weekday()
+        if day != 6:
+            date_min = date_min - datetime.timedelta(days=day + 1)
+        self.fields['start'].widget.attrs['min'] = date_min
+        date_min = date_min + datetime.timedelta(days=6)
+        self.fields['end'].widget.attrs['min'] = date_min
+
+    def clean(self):
+        data = super().clean()
+        start_date = data.get('start')
+        end_date = data.get('end')
+        day = start_date.weekday()
+        if day != 6:
+            start_date = start_date - datetime.timedelta(days=day + 1)
+        day = end_date.weekday()
+        if day != 5:
+            end_date = end_date + datetime.timedelta(days=5 - day)
+        data['start'] = start_date
+        data['end'] = end_date
+        return data

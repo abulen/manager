@@ -37,6 +37,22 @@
           <div class="container">
 
 
+          {% if user.is_authenticated %}
+          <div class="page-header">
+              <div class="btn-group float-right" role="group">
+                <!-- Create Schedule -->
+                <button class="btn btn-primary"><a href="{% url 'schedule:schedule-create' %}">Create Schedule</a></button>
+                <!-- View Schedule -->
+                <button class="btn btn-primary"><a href="{% url 'schedule:schedule' %}">View Schedule</a></button>
+                <!-- Add SSW -->
+                <button class="btn btn-primary"><a href="{% url 'schedule:ssw-create' %}">Add SSW</a></button>
+                <!-- Add SSW -->
+                <button class="btn btn-primary"><a href="{% url 'schedule:leave-create' %}">Add Leave</a></button>
+              </div>
+          </div>
+          {% endif %}
+
+
             <div class="btn-group float-right" role="group">
               <button class="btn btn-primary"><a href="{% url 'schedule:calendar-index' %}">Home</a></button>
 
@@ -56,8 +72,7 @@
 
       <div class="container">
         {% block navbar %}
-
-        {% endblock %}
+      {% endblock %}
 
         {% block breadcrumbs %}
         <ul class="breadcrumb">

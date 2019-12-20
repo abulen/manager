@@ -292,6 +292,7 @@ box-shadow:0 0 0 .2rem rgba(0,123,255,.5)
 
 .table th{
   text-align: center;
+  vertical-align: middle;
 }
 
 .table tr.clickable:hover {

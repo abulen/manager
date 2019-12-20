@@ -8,6 +8,13 @@ urlpatterns = [
          views.CalendarIndexView.as_view(),
          name='calendar-index'
          ),
+    path('schedule/',
+         views.ScheduleView.as_view(),
+         name='schedule'
+         ),
+    path('schedule/google-sync/',
+         views.google_sync,
+         name='google-sync'),
     path('shift/create/',
          views.CreateShiftView.as_view(),
          name='shift-create'),

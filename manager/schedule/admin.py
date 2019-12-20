@@ -9,11 +9,6 @@ from calendar import HTMLCalendar
 from django.utils.safestring import mark_safe
 
 
-#@admin.register(models.Shift)
-#class ShiftAdmin(admin.ModelAdmin):
-#    pass
-
-
 @admin.register(models.Leave)
 class LeaveAdmin(admin.ModelAdmin):
     pass
@@ -73,3 +68,8 @@ class ShiftAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.Shift, ShiftAdmin)
+
+
+@admin.register(models.GoogleCalendar)
+class GoogleCalendarAdmin(admin.ModelAdmin):
+    pass

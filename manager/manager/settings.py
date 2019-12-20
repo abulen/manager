@@ -121,6 +121,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+GOOGLE_CALENDAR_SCOPES = ['https://www.googleapis.com/auth/calendar']
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
@@ -130,3 +132,5 @@ STATIC_ROOT = '/var/www/html/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "staticfiles"),
 ]
+
+CREDENTIALS_DIR = 'creds'
