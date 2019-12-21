@@ -40,21 +40,40 @@
           {% if user.is_authenticated %}
           <div class="page-header">
               <div class="btn-group float-right" role="group">
-                <!-- Create Schedule -->
-                <button class="btn btn-primary"><a href="{% url 'schedule:schedule-create' %}">Create Schedule</a></button>
-                <!-- View Schedule -->
-                <button class="btn btn-primary"><a href="{% url 'schedule:schedule' %}">View Schedule</a></button>
-                <!-- Add SSW -->
-                <button class="btn btn-primary"><a href="{% url 'schedule:ssw-create' %}">Add SSW</a></button>
-                <!-- Add SSW -->
+
+                <button class="btn btn-primary"><a href="{% url 'schedule:calendar-index' %}">Home</a></button>
+
+                <!-- Schedule -->
+                <div class="dropdown">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                  Schedule
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'schedule:schedule-create' %}">Create Schedule</a><br>
+                        <a href="{% url 'schedule:schedule' %}">View Schedule</a><br>
+                        <a href="{% url 'schedule:ssw-create' %}">Add SSW</a><br>
+                        <a href="{% url 'schedule:leave-create' %}">Add Leave</a>
+                    </div>
+                </div>
+
+                <!-- Employee -->
+                <div class="dropdown">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                  Employee
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'employee:create-employee' %}">Add</a>
+                    </div>
+                </div>
+                <!--
                 <button class="btn btn-primary"><a href="{% url 'schedule:leave-create' %}">Add Leave</a></button>
+                -->
               </div>
           </div>
           {% endif %}
 
 
             <div class="btn-group float-right" role="group">
-              <button class="btn btn-primary"><a href="{% url 'schedule:calendar-index' %}">Home</a></button>
 
               {% block userlinks %}
                 {% if user.is_authenticated %}
