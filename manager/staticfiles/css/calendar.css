@@ -1,0 +1,68 @@
+
+#calendar table {
+border: 1px solid #999;
+border-collapse: collapse;
+font-family: Georgia, Times, serif;
+width: 100%;
+}
+#calendar th {
+text-align: center;
+align: center;
+border: 1px solid #999;
+font-size: 70%;
+text-transform: uppercase;
+}
+#calendar td {
+border: 1px solid #999;
+height: 5em;
+width:5em;
+padding: 5px;
+vertical-align: top;
+}
+#calendar caption {
+font-size: 300%;
+font-style: italic;
+}
+#calendar .day {
+text-align: center;
+}
+#calendar .shift {
+  color: Black;
+  background-color: HotPink;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 80%;
+  width: auto;
+  display: block;
+  text-align: center;
+}
+#calendar .ssw-day
+{
+  color: Black;
+}
+#calendar .ssw {
+  color: Red;
+  background-color: Black;
+  width: auto;
+  display: block;
+  text-align: center;
+}
+#calendar .ssw:hover {
+  color: Yellow;
+}
+#calendar .leave {
+  color: Green;
+  background-color: Black;
+  width: auto;
+  display: block;
+  text-align: center;
+}
+#calendar .leave:hover {
+  color: Yellow;
+}
+#calendar .weekend {
+  background-color: GhostWhite;
+}
+
+#calendar a {
+  width: 100%;
+}

@@ -305,70 +305,27 @@ background:DeepPink;
 color: #fff;
 }
 
-#calendar table {
-border: 1px solid #999;
-border-collapse: collapse;
-font-family: Georgia, Times, serif;
-width: 100%;
-}
-#calendar th {
-text-align: center;
-align: center;
-border: 1px solid #999;
-font-size: 70%;
-text-transform: uppercase;
-}
-#calendar td {
-border: 1px solid #999;
-height: 5em;
-width:5em;
-padding: 5px;
-vertical-align: top;
-}
-#calendar caption {
-font-size: 300%;
-font-style: italic;
-}
-#calendar .day {
-text-align: center;
-}
-#calendar .shift {
-  color: Black;
-  background-color: HotPink;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 80%;
-  width: auto;
-  display: block;
-  text-align: center;
-}
-#calendar .ssw-day
-{
-  color: Black;
-}
-#calendar .ssw {
-  color: Red;
-  background-color: Black;
-  width: auto;
-  display: block;
-  text-align: center;
-}
-#calendar .ssw:hover {
-  color: Yellow;
-}
-#calendar .leave {
-  color: Green;
-  background-color: Black;
-  width: auto;
-  display: block;
-  text-align: center;
-}
-#calendar .leave:hover {
-  color: Yellow;
-}
-#calendar .weekend {
-  background-color: GhostWhite;
+ul.nav-tools {
+  align: center;
+  width: 100%;
+  display: inline-block;
+  list-style-type: none;
+  overflow: hidden;
+  padding: 0;
 }
 
-#calendar a {
-  width: 100%;
+
+ul.nav-tools li.left {
+  float: left;
+}
+ul.nav-tools li.right {
+  float: right;
+}
+
+ul.nav-tools li a {
+  display: block;
+  text-align: center;
+  padding: 16px;
+  width: auto;
+  text-decoration: none;
 }

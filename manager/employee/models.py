@@ -5,6 +5,7 @@ Employee Models
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 
 class Position(models.Model):
@@ -140,13 +141,22 @@ class Employee(models.Model):
     def __str__(self):
         return self.user.username
 
+    def get_absolute_url(self):
+        return reverse('employee:employee-edit', kwargs={'pk': self.id})
+
     @staticmethod
     def store_manager():
-        return Employee.objects.get(position=Position.store_manager())
+        try:
+            return Employee.objects.get(position=Position.store_manager())
+        except Employee.DoesNotExist:
+            return None
 
     @staticmethod
     def asm():
-        return Employee.objects.get(position=Position.assistant_store_manager())
+        try:
+            return Employee.objects.get(position=Position.assistant_store_manager())
+        except Employee.DoesNotExist:
+            return None
 
     @staticmethod
     def employee_list():

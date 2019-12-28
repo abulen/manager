@@ -170,10 +170,12 @@ class ScheduleTable:
             Q(date__gte=sunday),
             Q(date__lte=saturday)
         )
+        if shifts.count() == 0:
+            return ' '
         week = self.get_week(sunday)
         employees = Employee.objects.active().order_by('user__last_name')
         header = "<table class='table table-striped'>" + \
-                 "<thead class='thead-dark'><tr><th>Employee</th>"
+                 "<thead class='thead-dark'><tr><th></th>"
         for day_name in week.keys():
             day = week[day_name]
             header += "<th>"

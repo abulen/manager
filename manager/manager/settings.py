@@ -134,3 +134,4 @@ STATICFILES_DIRS = [
 ]
 
 CREDENTIALS_DIR = 'creds'
+

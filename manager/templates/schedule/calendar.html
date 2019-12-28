@@ -1,14 +1,19 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block style_extra %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/calendar.css' %}"/>
+{% endblock %}
 
 {% block content %}
     <div id="calendar">
-        <ul class="object-tools">
-            <li>
+        <ul class="nav-tools">
+            <li class="left">
                 <a href={{ previous_month }}>
                     Previous month
                 </a>
             </li>
-            <li>
+            <li class="right">
                 <a href={{ next_month }}>
                     Next month
                 </a>

@@ -20,6 +20,7 @@
 	  	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
         {% endblock %}
         <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-manager.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/print.css' %}"/>
         {% if code_style %}<style>{{ code_style }}</style>{% endif %}
         {% block style_extra %}
         {% endblock %}
@@ -62,7 +63,8 @@
                   Employee
                     </button>
                     <div class="dropdown-menu">
-                        <a href="{% url 'employee:create-employee' %}">Add</a>
+                        <a href="{% url 'employee:employee-list' %}">View All</a><br>
+                        <a href="{% url 'employee:create-employee' %}">Add New</a>
                     </div>
                 </div>
                 <!--
@@ -70,6 +72,10 @@
                 -->
               </div>
           </div>
+          {% else %}
+            <div class="page-header">
+
+            </div>
           {% endif %}
 
 

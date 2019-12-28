@@ -1,0 +1,31 @@
+@media print {
+  .container {
+      width: auto;
+    }
+  /*body {transform: scale(.9);} */
+  table {page-break-inside: avoid;}
+
+  tr:nth-child(even) td {
+    background-color: #f8f9fa !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .table .thead-dark th {
+    color: #fff;
+    background-color: #212529 !important;
+    /*background-color: #f8f9fa !important;*/
+    border-color: #32383e;
+  }
+
+  footer {
+    display: none;
+  }
+
+  .breadcrumb {
+    display: none;
+  }
+
+  ul.nav-tools {
+    display: none;
+  }
+}

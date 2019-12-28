@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="colgroup" colspan="2">Active</th>
+        </tr>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Position</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for employee in employee_list %}
+        <tr class="clickable" onclick="window.location='{% url 'employee:employee-view' pk=employee.id %}'">
+            <td>{{ employee.user.first_name }} {{ employee.user.last_name }}</td>
+            <td>{{ employee.position }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% if inactive_employee_list %}
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="colgroup" colspan="2">Inactive</th>
+        </tr>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Position</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for employee in inactive_employee_list %}
+        <tr class="clickable" onclick="window.location='{% url 'employee:employee-view' pk=employee.id %}'">
+            <td>{{ employee.user.first_name }} {{ employee.user.last_name }}</td>
+            <td>{{ employee.position }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import Employee, Position
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
 
 
 class UserForm(forms.ModelForm):
@@ -12,7 +14,8 @@ class UserForm(forms.ModelForm):
 class EmployeeForm(forms.ModelForm):
     username = forms.CharField(label="Username", max_length=150)
     first_name = forms.CharField(label="First Name", max_length=30)
-    last_name = forms.CharField(label="Last Name", max_length=150)
+    last_name = forms.CharField(label="Last Name", max_length=150,
+                                required=False)
     email = forms.EmailField(label="Email", required=False)
     password = forms.CharField(label="Password",
                                max_length=32,
@@ -26,6 +29,14 @@ class EmployeeForm(forms.ModelForm):
     is_asm = forms.BooleanField(label="Assistant Store Manager",
                                 required=False)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'employee-form'
+        self.helper.form_class = 'blueForms'
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Save'))
+
     class Meta:
         model = Employee
         fields = ['username', 'first_name', 'last_name', 'email', 'password',
@@ -37,21 +48,25 @@ class EmployeeForm(forms.ModelForm):
         is_asm = cleaned_data.get('is_asm')
         password = cleaned_data.get('password', None)
         v_password = cleaned_data.get('v_password', None)
-
+        instance = self.instance
+        sm = Employee.store_manager()
+        asm = Employee.asm()
         if is_sm and is_asm:
             raise forms.ValidationError(
                 "Cannot select employee as Store Manager and "
                 "Assistant Store Manager"
             )
-        if is_sm and Employee.store_manager().exists():
-            raise forms.ValidationError(
-                "Another employee is already assigned as Store Manager"
-            )
-        if is_asm and Employee.asm().exists():
-            raise forms.ValidationError(
-                "Another employee is already assigned as "
-                "Assistant Store Manager"
-            )
+        if is_sm and sm:
+            if instance != sm:
+                raise forms.ValidationError(
+                    "Another employee is already assigned as Store Manager"
+                )
+        if is_asm and asm:
+            if instance != asm:
+                raise forms.ValidationError(
+                    "Another employee is already assigned as "
+                    "Assistant Store Manager"
+                )
         if password and not v_password:
             raise forms.ValidationError(
                 'Please Verify Password'
@@ -75,7 +90,9 @@ class EmployeeForm(forms.ModelForm):
         else:
             instance.user.username = self.cleaned_data.get('username', None)
             instance.user.email = self.cleaned_data.get('email', None)
-            instance.user.password = self.cleaned_data.get('password', None)
+            pwd = self.cleaned_data.get('password', None)
+            if pwd:
+                instance.user.password = pwd
         instance.user.first_name = self.cleaned_data.get('first_name', None)
         instance.user.last_name = self.cleaned_data.get('last_name', None)
         is_sm = self.cleaned_data.get('is_sm')
@@ -94,6 +111,7 @@ class EmployeeForm(forms.ModelForm):
             instance.status = 'inactive'
             instance.user.is_active = False
         if commit:
+            instance.user.save()
             instance.save()
         return instance
 

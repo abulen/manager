@@ -1,0 +1,42 @@
+
+#schedule table {
+border: 1px solid #999;
+border-collapse: collapse;
+width: 100%;
+}
+#schedule th {
+text-align: center;
+align: center;
+border: 1px solid #999;
+text-transform: uppercase;
+}
+#schedule td {
+border: 1px solid #999;
+width: 12.5%;
+padding: 5px;
+text-align: center;
+vertical-align: middle;
+}
+#schedule caption {
+font-size: 300%;
+font-style: italic;
+}
+#schedule .day {
+text-align: center;
+}
+#schedule .shift {
+  color: Black;
+  background-color: HotPink;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 80%;
+  width: auto;
+  display: block;
+  text-align: center;
+}
+#schedule .weekend {
+  background-color: GhostWhite;
+}
+
+#schedule a {
+  width: 100%;
+}
