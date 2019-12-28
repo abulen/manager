@@ -91,15 +91,15 @@ class CreateLeaveForm(forms.Form):
         queryset=models.Employee.objects.active()
     )
     start = forms.DateField(
-        label="Schedule Start",
+        label="Leave Start",
         widget=forms.TextInput(
-            attrs={'type': 'date'}
+            attrs={'type': 'date', 'id': 'leave_start_id'}
         )
     )
     end = forms.DateField(
-        label="Schedule End",
+        label="Leave End",
         widget=forms.TextInput(
-            attrs={'type': 'date'}
+            attrs={'type': 'date', 'id': 'leave_end_id'},
         )
     )
 

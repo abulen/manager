@@ -4,3 +4,19 @@
 {% block content %}
 {% crispy form %}
 {% endblock %}
+
+{% block script_extra %}
+<script>
+    document.getElementById("leave_start_id").onchange = function() {
+        end = document.getElementById("leave_end_id");
+        start = document.getElementById("leave_start_id");
+        if(!(end.value)){
+            end.value=start.value;
+        }
+        if(end.value<start.value){
+            end.value=start.value;
+        }
+        end.min = start.value;
+    };
+</script>
+{% endblock %}
