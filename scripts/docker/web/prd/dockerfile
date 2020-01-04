@@ -2,12 +2,7 @@ ARG base=phusion/passenger-customizable
 FROM ${base} as builder
 
 ENV CONTAINER_HOME=/home/app
-
-#CMD ["/sbin/my_init"]
-
-#RUN apt-get update -qq; \
-#    apt-get install -y --fix-missing --no-install-recommends \
-#        software-properties-common wget
+CMD /sbin/my_init
 
 RUN apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing --no-install-recommends \
@@ -18,7 +13,7 @@ RUN apt-get update && \
   git
 
 WORKDIR $CONTAINER_HOME
-RUN git clone https://$GITHUB_USER:$GITHUB_PASSWORD@github.com/abulen/manager.git
+RUN git clone https://github.com/abulen/manager.git
 
 # move to app directory
 WORKDIR $CONTAINER_HOME/app
@@ -39,13 +34,9 @@ FROM ${base} AS runner
 ENV CONTAINER_HOME=/home/app
 ENV CONTAINER_PROJECT=$CONTAINER_HOME/web
 
-#CMD ["/sbin/my_init"]
+CMD /sbin/my_init
 
 RUN rm -f /etc/service/nginx/down /etc/nginx/sites-enabled/default
-
-#RUN apt-get update -qq; \
-#    apt-get install -y --fix-missing --no-install-recommends \
-#        software-properties-common wget
 
 RUN apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing --no-install-recommends \
