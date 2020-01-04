@@ -16,7 +16,7 @@ WORKDIR $CONTAINER_HOME
 RUN git clone https://github.com/abulen/manager.git
 
 # move to app directory
-WORKDIR $CONTAINER_HOME/app
+WORKDIR $CONTAINER_HOME/manager/app
 
 # install dependencies
 RUN python3 -m pip install --upgrade pip && \
@@ -45,9 +45,9 @@ RUN apt-get update && \
   python3-pip \
   python3-setuptools
 
-COPY --from=builder /home/app/app /home/app/web
-COPY --from=builder /home/app/scripts/docker/web/site.conf /etc/nginx/sites-enabled/site.conf
-COPY --from=builder /home/app/scripts/docker/web/entrypoint.sh $CONTAINER_HOME
+COPY --from=builder /home/app/manager/app /home/app/web
+COPY --from=builder /home/app/manager/scripts/docker/web/site.conf /etc/nginx/sites-enabled/site.conf
+COPY --from=builder /home/app/manager/scripts/docker/web/entrypoint.sh $CONTAINER_HOME
 RUN chmod +x $CONTAINER_HOME/*.sh
 
 # move to home Project directory

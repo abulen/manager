@@ -2,24 +2,26 @@ version: '3.4'
 
 services:
   web:
+    image: 192.168.13.100:30000/manager
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: scripts/docker/web/prd/dockerfile
     volumes:
       - static_volume:/home/app/web/static
     expose:
       - 8000
     env_file:
-      - .env
+      - scripts/docker/web/prd/.env
     depends_on:
       - db
   db:
     image: postgres:12.0-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    env_file:
-      - .env.db
-
+    environment:
+      - POSTGRES_USER=manager
+      - POSTGRES_PASSWORD=Manag3/2
+      - POSTGRES_DB=manager
 volumes:
   postgres_data:
   static_volume:
