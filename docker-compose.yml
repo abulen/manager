@@ -5,11 +5,10 @@ services:
     build:
       context: .
       dockerfile: scripts/docker/web/dev/dockerfile
-    command: python manage.py runserver 127.0.0.0:8000
     volumes:
       - ./app/:/usr/src/app/
     ports:
-      - 8000:8000
+      - 8000:80
     env_file:
       - scripts/docker/web/dev/.env
     depends_on:
@@ -19,9 +18,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=hello_django
-      - POSTGRES_PASSWORD=hello_django
-      - POSTGRES_DB=hello_django_dev
+      - POSTGRES_USER=manager
+      - POSTGRES_PASSWORD=Manag3/2
+      - POSTGRES_DB=manager_dev
 
 volumes:
   postgres_data:

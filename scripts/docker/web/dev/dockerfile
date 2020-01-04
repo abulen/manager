@@ -1,27 +1,50 @@
-# pull official base image
-FROM python:3.8.0-alpine
+ARG base=phusion/passenger-customizable
+FROM ${base}
 
-# set work directory
-WORKDIR /usr/src/app
+ENV HOME /root
+ENV CONTAINER_HOME=/home/app
+ENV CONTAINER_PROJECT=$CONTAINER_HOME/web
 
-# set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+CMD ["/sbin/my_init"]
 
-# install psycopg2 dependencies
-RUN apk update \
-    && apk add postgresql-dev gcc python3-dev musl-dev
+RUN rm -f /etc/service/nginx/down /etc/nginx/sites-enabled/default
 
-# install dependencies
-RUN pip install --upgrade pip
-COPY ./app/requirements.txt /usr/src/app/requirements.txt
-RUN pip install -r requirements.txt
+RUN apt-get update -qq; \
+    apt-get install -y --fix-missing --no-install-recommends \
+        software-properties-common wget
 
-# copy entrypoint.sh
-COPY ./scripts/docker/web/dev/entrypoint.sh /usr/src/app/entrypoint.sh
+RUN apt-get update && \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing --no-install-recommends \
+  binutils \
+  python3 \
+  python3-pip \
+  python3-setuptools
 
-# copy project
-COPY app/ /usr/src/app/
+ADD scripts/docker/web/site.conf /etc/nginx/sites-enabled/site.conf
+COPY scripts/docker/web/dev/entrypoint.sh $CONTAINER_HOME
+RUN chmod +x $CONTAINER_HOME/*.sh
 
-# run entrypoint.sh
-#ENTRYPOINT ["./entrypoint.sh"]
+# COPY project to container directory
+COPY app/ $CONTAINER_PROJECT
+
+# move to home Project directory
+WORKDIR $CONTAINER_PROJECT
+RUN python3 -m pip install \
+         --trusted-host pypi.org \
+         --trusted-host pypi.python.org \
+         --trusted-host files.pythonhosted.org \
+         --upgrade pip && \
+    sleep 5 && \
+	pip3 install \
+         --trusted-host pypi.org \
+         --trusted-host pypi.python.org \
+         --trusted-host files.pythonhosted.org \
+         -r requirements.txt
+
+RUN python3 manage.py collectstatic --noinput
+
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# start app
+EXPOSE 80

@@ -5,7 +5,6 @@ services:
     build:
       context: .
       dockerfile: scripts/docker/web/prd/dockerfile
-    command: gunicorn hello_django.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - static_volume:/home/app/web/static
     expose:
@@ -21,7 +20,8 @@ services:
     env_file:
       - scripts/docker/web/prd/.env.db
   nginx:
-    build: ./nginx
+    build:
+      context: ./scripts/docker/nginx/
     volumes:
       - static_volume:/home/app/web/static
     ports:
