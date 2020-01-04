@@ -1,70 +1,74 @@
-###########
-# BUILDER #
-###########
+ARG base=phusion/passenger-customizable
+FROM ${base} as builder
 
-# pull official base image
-FROM python:3.8.0-alpine as builder
+ENV CONTAINER_HOME=/home/app
 
-# set work directory
-WORKDIR /usr/src/app
+#CMD ["/sbin/my_init"]
 
-# set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+#RUN apt-get update -qq; \
+#    apt-get install -y --fix-missing --no-install-recommends \
+#        software-properties-common wget
 
-# install psycopg2 dependencies
-RUN apk update \
-    && apk add postgresql-dev gcc python3-dev musl-dev
+RUN apt-get update && \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing --no-install-recommends \
+  binutils \
+  python3 \
+  python3-pip \
+  python3-setuptools \
+  git
 
-# lint
-#RUN pip install --upgrade pip
-#RUN pip install flake8
-COPY app/ /usr/src/app/
-#RUN flake8 --ignore=E501,F401 .
+WORKDIR $CONTAINER_HOME
+RUN git clone https://$GITHUB_USER:$GITHUB_PASSWORD@github.com/abulen/manager.git
 
-# install dependencies
-COPY app/requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
-
-
-#########
-# FINAL #
-#########
-
-# pull official base image
-FROM python:3.8.0-alpine
-
-# create directory for the app user
-RUN mkdir -p /home/app
-
-# create the app user
-RUN addgroup -S app && adduser -S app -G app
-
-# create the appropriate directories
-ENV HOME=/home/app
-ENV APP_HOME=/home/app/web
-RUN mkdir $APP_HOME
-RUN mkdir $APP_HOME/static
-WORKDIR $APP_HOME
+# move to app directory
+WORKDIR $CONTAINER_HOME/app
 
 # install dependencies
-RUN apk update && apk add libpq
-COPY --from=builder /usr/src/app/wheels /wheels
-COPY --from=builder /usr/src/app/requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install --no-cache /wheels/*
+RUN python3 -m pip install --upgrade pip && \
+    sleep 5 && \
+	  pip3 install -r requirements.txt
 
-# copy entrypoint-prod.sh
-COPY scripts/docker/web/prd/entrypoint.sh $APP_HOME
+RUN python3 manage.py collectstatic --noinput
 
-# copy project
-COPY app/ $APP_HOME
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# chown all the files to the app user
-RUN chown -R app:app $APP_HOME
 
-# change to the app user
-USER app
+FROM ${base} AS runner
 
-# run entrypoint.prod.sh
-ENTRYPOINT ["/home/app/web/entrypoint.sh"]
+ENV CONTAINER_HOME=/home/app
+ENV CONTAINER_PROJECT=$CONTAINER_HOME/web
+
+#CMD ["/sbin/my_init"]
+
+RUN rm -f /etc/service/nginx/down /etc/nginx/sites-enabled/default
+
+#RUN apt-get update -qq; \
+#    apt-get install -y --fix-missing --no-install-recommends \
+#        software-properties-common wget
+
+RUN apt-get update && \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing --no-install-recommends \
+  binutils \
+  python3 \
+  python3-pip \
+  python3-setuptools
+
+COPY --from=builder /home/app/app /home/app/web
+COPY --from=builder /home/app/scripts/docker/web/site.conf /etc/nginx/sites-enabled/site.conf
+COPY --from=builder /home/app/scripts/docker/web/entrypoint.sh $CONTAINER_HOME
+RUN chmod +x $CONTAINER_HOME/*.sh
+
+# move to home Project directory
+WORKDIR $CONTAINER_PROJECT
+RUN python3 -m pip install --upgrade pip && \
+    sleep 5 && \
+	  pip3 install -r requirements.txt
+
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# start app
+EXPOSE 80
+
+
